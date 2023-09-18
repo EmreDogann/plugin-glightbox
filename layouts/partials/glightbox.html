@@ -1,2 +1,40 @@
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" />
-<script src="https://cdn.jsdelivr.net/gh/mcstudios/glightbox/dist/js/glightbox.min.js"></script>
+{{ $content := (.context.Page.Resources.ByType "image") }}
+{{ if .match }}
+	{{ $content = (.context.Page.Resources.Match .match) }}
+{{ end }}
+
+
+<!-- Load jquery, jquery-lazy, swipebox and justified_gallery only once per page -->
+{{ if not (.Page.Scratch.Get "gLightBoxLoaded") }}
+	{{ .Page.Scratch.Set "gLightBoxLoaded" true }}
+	<!-- Use relURL to support hugo projects that run in a subdirectory (bug #18) -->
+	{{ partial "glightboxIncludes.html" }}
+
+
+	<script src="{{ "glightbox.js" | relURL }}"></script>
+{{ end }}
+
+{{ range $original := $content }}
+	<a
+		href="{{ $original.RelPermalink }}"
+		class="glightbox"
+		{{ with $.gallery }}
+			data-gallery="{{ . }}"
+		{{ else }}
+			data-gallery="{{ .Page.File.UniqueID }}"
+		{{ end }}
+		{{ if or ($.title) ($.description) }}
+			data-glightbox="title:{{ $.title | default "" }};description:{{ $.description | default "" }}"
+		{{ end }}>
+		<img
+			src="{{ $original.RelPermalink }}"
+			class="nozoom"
+			style="border-radius: 5px; max-width: 100%"
+			{{ if $.alt }}
+				alt="{{ $.alt }}"
+			{{ end }}
+			{{ if $.title }}
+				title={{ $.title }}
+			{{ end }} />
+	</a>
+{{ end }}
