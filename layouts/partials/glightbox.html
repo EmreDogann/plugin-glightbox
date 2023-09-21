@@ -1,22 +1,35 @@
-{{ $content := (.context.Page.Resources.ByType "image") }}
-{{ if .match }}
-	{{ $content = (.context.Page.Resources.Match .match) }}
+{{ $disableImageOptimization := .Page.Site.Params.disableImageOptimization | default false }}
+
+{{ $content := .content }}
+{{ if not .content }}
+	{{ $content = (.context.Page.Resources.ByType "image") }}
+	{{ if .match }}
+		{{ $content = (.context.Page.Resources.Match .match) }}
+	{{ end }}
 {{ end }}
 
 
 <!-- Load jquery, jquery-lazy, swipebox and justified_gallery only once per page -->
-{{ if not (.Page.Scratch.Get "gLightBoxLoaded") }}
-	{{ .Page.Scratch.Set "gLightBoxLoaded" true }}
+{{ if not (.context.Page.Scratch.Get "gLightBoxLoaded") }}
+	{{ partial "glightboxIncludes.html" . }}
+
+
 	<!-- Use relURL to support hugo projects that run in a subdirectory (bug #18) -->
-	{{ partial "glightboxIncludes.html" }}
-
-
 	<script src="{{ "glightbox.js" | relURL }}"></script>
 {{ end }}
 
-{{ range $original := $content }}
+{{ range $image := $content }}
+	{{ if and (not $disableImageOptimization) (not $.content ) }}
+		{{ with $.resolution }}
+			{{ $image = $image.Resize . }}
+		{{ else }}
+			{{ $image = $image.Resize "640x" }}
+		{{ end }}
+	{{ end }}
+
+
 	<a
-		href="{{ $original.RelPermalink }}"
+		href="{{ $image.RelPermalink }}"
 		class="glightbox"
 		{{ with $.gallery }}
 			data-gallery="{{ . }}"
@@ -27,7 +40,7 @@
 			data-glightbox="title:{{ $.title | default "" }};description:{{ $.description | default "" }}"
 		{{ end }}>
 		<img
-			src="{{ $original.RelPermalink }}"
+			src="{{ $image.RelPermalink }}"
 			class="nozoom"
 			style="border-radius: 5px; max-width: 100%"
 			{{ if $.alt }}
