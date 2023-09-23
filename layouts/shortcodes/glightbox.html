@@ -1,40 +1,22 @@
-{{ $content := (.Page.Resources.ByType "image") }}
-{{ if .Get "match" }}
-	{{ $content = (.Page.Resources.Match (.Get "match")) }}
-{{ end }}
-
-
-<!-- Load jquery, jquery-lazy, swipebox and justified_gallery only once per page -->
-{{ if not (.Page.Scratch.Get "gLightBoxLoaded") }}
-	{{ .Page.Scratch.Set "gLightBoxLoaded" true }}
-	<!-- Use relURL to support hugo projects that run in a subdirectory (bug #18) -->
-	{{ partial "glightboxIncludes.html" }}
-
-
-	<script src="{{ "glightbox.js" | relURL }}"></script>
-{{ end }}
-
-{{ range $original := $content }}
-	<a
-		href="{{ $original.RelPermalink }}"
-		class="glightbox"
-		{{ with $.Get "gallery" }}
-			data-gallery="{{ . }}"
-		{{ else }}
-			data-gallery="{{ $.Page.File.UniqueID }}"
+<a
+	href="{{ .Get "src" }}"
+	class="glightbox {{ .Get "class" }} hover:bg-transparent"
+	{{ with .Get "gallery" }}
+		data-gallery="{{ . }}"
+	{{ else }}
+		data-gallery="{{ .Page.File.UniqueID }}"
+	{{ end }}
+	{{ if or (.Get "title") (.Get "description") }}
+		data-glightbox="title:{{ .Get "title" | default "" }};description:{{ .Get "description" | default "" }}"
+	{{ end }}>
+	<img
+		src="{{ .Get "src" }}"
+		class="nozoom"
+		style="border-radius: 5px; max-width: 100%"
+		{{ if .Get "alt" }}
+			alt="{{ .Get "alt" }}"
 		{{ end }}
-		{{ if or ($.Get "title") ($.Get "description") }}
-			data-glightbox="title:{{ $.Get "title" | default "" }};description:{{ $.Get "description" | default "" }}"
-		{{ end }}>
-		<img
-			src="{{ $original.RelPermalink }}"
-			class="nozoom"
-			style="border-radius: 5px; max-width: 50%"
-			{{ if $.Get "alt" }}
-				alt="{{ $.Get "alt" }}"
-			{{ end }}
-			{{ if $.Get "title" }}
-				title={{ $.Get "title" }}
-			{{ end }} />
-	</a>
-{{ end }}
+		{{ if .Get "title" }}
+			title={{ .Get "title" }}
+		{{ end }} />
+</a>
