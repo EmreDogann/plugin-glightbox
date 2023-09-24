@@ -2,7 +2,8 @@
 <link rel="stylesheet" href="{{ "animations.css" | relURL }}" />
 <link rel="stylesheet" href="{{ "glightboxOverrides.css" | relURL }}" />
 
-<script src="https://cdn.jsdelivr.net/gh/mcstudios/glightbox/dist/js/glightbox.min.js"></script>
-<script defer src="{{ "glightbox.js" | relURL }}"></script>
+{{/* <script src="https://cdn.jsdelivr.net/gh/mcstudios/glightbox/dist/js/glightbox.min.js"></script> */}}
+<script src="{{ "glightbox.js" | relURL }}"></script>
+<script defer src="{{ "glightboxSetup.js" | relURL }}"></script>
 
 {{ .Page.Scratch.Set "gLightBoxLoaded" true }}
